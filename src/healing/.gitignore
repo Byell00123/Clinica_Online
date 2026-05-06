@@ -1,0 +1,31 @@
+# Ambiente virtual
+venv/
+env/
+ENV/
+
+# Banco de dados SQLite
+db.sqlite3
+*.db
+
+# Arquivos de mídia enviados pelo usuário
+media/
+staticfiles/
+
+# Arquivos Python compilados
+__pycache__/
+*.py[cod]
+*.so
+
+# Arquivos de configuração local (se existirem)
+*.env
+*.local.py
+
+# Logs e arquivos temporários
+*.log
+*.tmp
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
