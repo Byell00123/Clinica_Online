@@ -1,0 +1,42 @@
+# (sem o campo 'version' - usará a especificação moderna)
+
+services:
+  db:
+    container_name: clinica_db    # nome para o container do MySQL
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=bd_clinica
+      - MYSQL_USER=adminclinica
+      - MYSQL_PASSWORD=admindjango     # Senha do usuário comum
+      - MYSQL_ROOT_PASSWORD=senhaclinica # Senha do ROOT
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "adminclinica", "-padmindjango"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    container_name: Clinica       # nome principal para o container do site
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=bd_clinica
+      - DB_USER=adminclinica
+      - DB_PASSWORD=admindjango
+      - DB_PORT=3306
+    depends_on:
+      db:
+        condition: service_healthy  # Agora funciona sem o 'version' antigo
+
+volumes:
+  mysql_data:

@@ -1,0 +1,9 @@
+asgiref==3.11.1
+Django==6.0.5
+pillow==12.2.0
+pytz==2026.2
+sqlparse==0.5.5
+# Driver para conectar o Django ao MySQL
+mysqlclient==2.2.8
+# Opcional, mas altamente recomendado para gerenciar variáveis de ambiente de forma segura
+python-dotenv==1.0.1

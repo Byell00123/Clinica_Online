@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block 'title' %} - Paciente Home{% endblock 'title' %}
+    
     {% block 'head' %}
         <link rel="stylesheet" href="{% static 'medicos/css/abrir_horario.css' %}">
         <link rel="stylesheet" href="{% static 'usuarios/css/usuarios.css' %}">
@@ -18,7 +20,7 @@
             <div class="row">
                 <div class="col-md-8">
                     <p style="font-size: 25px" class="p-bold">Olá, <span class="color-dark">{{request.user.username}}.</span></p>
-                    <form action="{% url 'home' %} " post="GET">
+                    <form action="{% url 'home_usuario' %} " post="GET">
                         <input type="text" class="form-control shadow-main-color" placeholder="Busque por profissionais ..." name="medico">
                         <br>
                         
@@ -32,7 +34,7 @@
                         {% endfor %}
                         <br>
                         <input type="submit" value="filtrar" class="btn btn-success btn-dark-color">
-                        <button onclick="{% url 'home' %}" class="btn btn-success btn-dark-color">Cancelar Filtro</button>
+                        <button onclick="{% url 'home_usuario' %}" class="btn btn-success btn-dark-color">Cancelar Filtro</button>
                     </form>
                     <hr>
 
@@ -71,8 +73,9 @@
                     <p style="font-size: 25px" class="p-bold">Lembretes</p>
 
                     <p class="bg-main-lembrete">
-                        <span class="p-bold"><i class="bi bi-exclamation-triangle-fill icon-differential"></i>&nbsp;&nbsp; Consulta com Pedro Sampario em 7 dias.</span>
+                        <span class="p-bold"><i class="bi bi-exclamation-triangle-fill icon-differential"></i>&nbsp;&nbsp; Consultas dos proximos 7 dias.</span>
                     </p>
+                    {% comment %} Aqui precisa de uma lista igual tem no medico que lsita as consultas dele {% endcomment %}
 
 
                     

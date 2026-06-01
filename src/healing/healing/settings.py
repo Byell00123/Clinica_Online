@@ -67,8 +67,12 @@ WSGI_APPLICATION = 'healing.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME', 'bd_clinica'),
+        'USER': os.environ.get('DB_USER', 'adminclinica'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'admindjango'),  # <-- senha do adminclinica
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
     }
 }
 
@@ -116,3 +120,5 @@ MESSAGE_TAGS = {
     constants.INFO: 'alert-info', # Azul
     constants.WARNING: 'alert-warning', # Amarelo
 }
+
+#LOGIN_URL = '/acesso_negado'

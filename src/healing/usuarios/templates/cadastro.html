@@ -19,17 +19,13 @@
                     </section>
                     <hr>
                     <form action="{% url 'cadastro' %}" method="POST">{% csrf_token %}
-
-                        {% if messages %} {% comment %} messages == lista de mensagens. {% endcomment %}
-                            {% for message in messages %} {% comment %} message == variavel criada para percorrer a lista, podendo ate mudar de nome. {% endcomment %}
-                                <section class="alert {{message.tags}}">{{message}}</section>{% comment %} {{message.tags}} == variavel que vem do settings.py linha: 110. {% endcomment %}
-                            {% endfor %}
-                        {% endif %}
-
                         <h2 class="fonte-destaque1">Cadastre-se</h2>
                         <br>
-                        <label for="">Nome de Usuario</label>
-                        <input type="text" name="nome_usuario" id="" class="form-control" placeholder="Nome de Usuario ..." autocomplete="username">
+                        <label for="">Primeiro Nome</label>
+                        <input type="text" name="primeiro_nome" id="" class="form-control" placeholder="Primeiro Nome ..." autocomplete="name">
+                        <br>
+                        <label for="">Sobrenome</label>
+                        <input type="text" name="sobrenome" id="" class="form-control" placeholder="Sobrenome ..." autocomplete="name">
                         <br>
                         <label for="">E-mail</label>
                         <input type="text" name="email" id="" class="form-control" placeholder="email@email.com" autocomplete="email">

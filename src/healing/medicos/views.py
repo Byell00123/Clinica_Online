@@ -18,7 +18,7 @@ def cadastro_medico(request):
     
     elif request.method == "POST":
         crm = request.POST.get('crm')
-        nome = request.POST.get('nome')
+        nome = request.POST.get('nome')  #TODO: Mudar de ` request.POST.get ´ vindo do <input> la no HTML. Pois o nome já vem da tabela Usuario
         cep = request.POST.get('cep')
         rua = request.POST.get('rua')
         bairro = request.POST.get('bairro')
@@ -61,7 +61,7 @@ def abrir_horario(request):
     if not is_medico(request.user):
 
         messages.add_message(request, constants.WARNING, 'Somente médicos podem acessar essa página.')
-        return redirect('/usuarios/sair/')
+        return redirect('/usuarios/home/')
 
     if request.method == "GET":
         dados_medicos = DadosMedico.objects.get(user=request.user)
@@ -89,7 +89,7 @@ def abrir_horario(request):
 def consultas_medico(request):
     if not is_medico(request.user):
         messages.add_message(request, constants.WARNING, 'Somente médicos podem acessar essa página.')
-        return redirect('/usuarios/sair/')
+        return redirect('/usuarios/home/')
     
     hoje = datetime.now().date()
 

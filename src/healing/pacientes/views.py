@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.messages import constants
 from django.contrib import messages
 
-
+@login_required
 def home(request):
     if request.method == "GET":
         medico_filtrar = request.GET.get('medico')
