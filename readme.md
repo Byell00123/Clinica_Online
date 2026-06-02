@@ -15,7 +15,6 @@ Este projeto tem como tema um site para um consultório médico, com áreas de c
 - **Histórico de Consultas:** Consultas confirmadas ficam salvas no histórico do paciente e do médico, permitindo acesso a receitas e documentos enviados durante o atendimento.
 - **Análise de Desempenho para Médicos:** Os médicos têm acesso a um gráfico que mostra horas trabalhadas, dias trabalhados e ganhos financeiros em um determinado período de tempo.
 
-########################
 
 ## 📦 Pré‑requisitos
 
@@ -46,68 +45,117 @@ cd Clinica_Online/src/healing
 ```
 
 ### 2. Execute o Docker Compose
-Abra o VSCode na pasta atual, abra o terminal do programa usando "CTRL+J" 
+Abra o VSCode na pasta atual(`Clinica_Online/src/healing`), depois abra o terminal do VSCode usando "CTRL+J".
 ```bash
 docker compose up
 ```
 
-Na primeira vez o Docker irá:
-- Baixar as imagens necessárias (Python 3.12, MySQL 8.0)
-- Construir a imagem da aplicação (instalar dependências, etc.)
+Na primeira execução, o Docker irá:
+- Baixar as imagens do Python 3.12 e MySQL 8.0
+- Construir a imagem da aplicação (instalar dependências Python, etc.)
 - Criar os containers `Clinica` (Django) e `clinica_db` (MySQL)
 - Aguardar o MySQL ficar pronto
-- Rodar as migrações automaticamente
-- Iniciar o servidor de desenvolvimento do Django
+- Aplicar as migrações automaticamente
+- Iniciar o servidor Django
 
-### 3. Acesse o site
+Para **rodar em segundo plano** (liberar o terminal), adicione a flag `-d`:
+```bash
+docker compose up -d
+```
 
+Com os containers em segundo plano, você pode usar outros comandos livremente (veja a seção abaixo).
+
+#### Comandos do Django sem ambiente virtual
+Antes, você precisava ativar o `venv` para rodar `python manage.py ...`.  
+Agora, com Docker, os comandos são executados **dentro do container**. A estrutura básica é:
+
+```bash
+docker compose exec web python manage.py <comando>
+```
+
+Exemplos:
+
+| Ação | Comando |
+|------|---------|
+| Criar superusuário | `docker compose exec web python manage.py createsuperuser` |
+| Acessar o shell do Django | `docker compose exec web python manage.py shell` |
+| Criar novas migrações | `docker compose exec web python manage.py makemigrations` |
+| Aplicar migrações | `docker compose exec web python manage.py migrate` |
+| Coletar arquivos estáticos | `docker compose exec web python manage.py collectstatic` |
+
+> **Atenção:** O container `Clinica` precisa estar rodando. Se usou `up` sem `-d`, abra outro terminal para esses comandos.
+
+#### Por que isso funciona?
+- Todas as dependências (Django, mysqlclient, etc.) já estão instaladas na imagem do container.
+- O comando `docker compose exec` executa o que você deseja dentro do container em funcionamento.
+- As variáveis de ambiente (como `DB_HOST`) já estão definidas, então o Django conecta ao MySQL sem configuração extra.
+
+#### E se eu quiser rodar um comando antes de subir o container?
+Para comandos que não dependem dos serviços (ex: `startapp`), use `docker compose run`:
+
+```bash
+docker compose run --rm web python manage.py startapp meu_app
+```
+
+A flag `--rm` remove o container temporário após a execução.
+
+#### Tabela de equivalência (antes e depois do Docker)
+
+| Antes (com venv ativo) | Agora (com Docker) |
+|------------------------|---------------------|
+| `python manage.py runserver` | Automático no `docker compose up` |
+| `python manage.py migrate` | Já executado no `up`; manual: `docker compose exec web python manage.py migrate` |
+| `python manage.py createsuperuser` | `docker compose exec web python manage.py createsuperuser` |
+| `python manage.py shell` | `docker compose exec web python manage.py shell` |
+| `python manage.py test` | `docker compose exec web python manage.py test` |
+
+### 3. Acessar o site
 Abra o navegador e vá para:  
 👉 **http://localhost:8000**
 
-O servidor Django estará ouvindo na porta **8000** da sua máquina.
+O servidor de desenvolvimento do Django estará ouvindo na porta **8000** da sua máquina.
 
 ---
 
-## 🛢️ Conectando ao banco de dados com MySQL Workbench
+## 🛢️ Conectar ao banco de dados (MySQL Workbench)
 
-O banco de dados MySQL roda no container `clinica_db` e está mapeado para a porta **3307** do seu computador.  
-Use os seguintes dados para configurar uma conexão no MySQL Workbench (ou qualquer outro cliente MySQL):
+O MySQL está rodando no container `clinica_db` e mapeado para a porta **3307** do seu computador.  
+Utilize os seguintes dados de conexão:
 
-| Campo               | Valor               |
-|---------------------|---------------------|
-| **Connection name** | `Clinica`           |
-| **Hostname**        | `localhost`         |
-| **Port**            | `3307`              |
-| **Username**        | `adminclinica`      |
-| **Password**        | `admindjango`       |
-| **Default Schema**  | `bd_clinica`        |
+| Campo | Valor |
+|-------|-------|
+| **Connection name** | `Clinica` |
+| **Hostname** | `localhost` |
+| **Port** | `3307` |
+| **Username** | `adminclinica` |
+| **Password** | `admindjango` |
+| **Default Schema** | `bd_clinica` |
 
-**Observação:**  
-> O usuário `adminclinica` tem acesso total ao banco `bd_clinica`, que é o banco usado pela aplicação Django.  
-> A senha de **root** (`senhaclinica`) existe apenas para administração do MySQL e não é necessária para acessar o banco da clínica.
+> ℹ️ O usuário `adminclinica` tem privilégios totais apenas sobre o banco `bd_clinica`. A senha de root (`senhaclinica`) não é necessária para acessar os dados da aplicação.
 
-### Configurando a conexão no Workbench
-
-1. Clique no ícone **+** ao lado de "MySQL Connections".
-2. Preencha os campos conforme a tabela acima.
-3. Clique em **Test Connection** – deve aparecer "Successfully made the MySQL connection".
-4. Clique em **OK** para salvar.
-
-Agora você pode navegar pelas tabelas criadas pelo Django (`medicos`, `pacientes`, etc.).
+### Passos no Workbench
+1. Clique no **+** ao lado de "MySQL Connections".
+2. Preencha com os dados da tabela.
+3. Clique em **Test Connection** – a mensagem "Successfully made the MySQL connection" deve aparecer.
+4. Salve e conecte. Agora você pode explorar as tabelas (`medicos`, `pacientes`, etc.).
 
 ---
 
 ## 🛑 Parando os containers
 
-Para parar tudo, pressione `Ctrl+C` no terminal onde o `docker compose up` está rodando.  
-Se quiser parar e remover os containers (mantendo os dados do banco):
+- Se iniciou com `docker compose up` (primeiro plano), pressione **Ctrl+C** no terminal.
+- Se usou `docker compose up -d` (segundo plano):
 
 ```bash
+# Apenas pausar os containers (dados preservados)
+docker compose stop
+
+# Parar e remover os containers (dados do banco mantidos)
 docker compose down
 ```
 
-Os dados do MySQL são armazenados em um volume Docker chamado `healing_mysql_data` e **não serão perdidos** ao parar ou remover os containers.  
-Para apagar os dados de vez (começar do zero), remova também o volume:
+Os dados do MySQL ficam em um volume Docker (`healing_mysql_data`) e **sobrevivem** a remoções normais.  
+Para apagar tudo e recomeçar do zero:
 
 ```bash
 docker compose down -v
@@ -121,55 +169,38 @@ docker compose down -v
 .
 ├── docker-compose.yml      # Define os serviços (web + db)
 ├── Dockerfile              # Constrói a imagem da aplicação Django
-├── entrypoint.sh           # Script que espera o MySQL e roda migrações
+├── entrypoint.sh           # Script de inicialização (aguarda MySQL, migra e sobe o servidor)
 ├── requirements.txt        # Dependências Python (Django, mysqlclient, etc.)
 ├── manage.py               # Utilitário do Django
-└── healing/                # Projeto Django (settings, urls, etc.)
+└── healing/                # Configurações do projeto (settings, urls, etc.)
 ```
 
 ---
 
-## 🔧 Solução de problemas comuns
+## 🔧 Problemas comuns
 
-### ❌ O container `Clinica` fica repetindo "MySQL ainda não está disponível..."
-- Verifique se o container do MySQL (`clinica_db`) subiu corretamente.
-- Confira se a senha no `docker-compose.yml` (healthcheck) está correta (`-padmindjango`).
-- Tente aumentar o tempo de espera: no `entrypoint.sh`, mude `sleep 2` para `sleep 5`.
+### O container `Clinica` exibe "MySQL ainda não está disponível..." repetidamente
+- Verifique se o container `clinica_db` está rodando com `docker ps`.
+- Confirme se a senha no healthcheck do `docker-compose.yml` está correta (`-padmindjango`).
+- Se necessário, aumente o tempo de espera editando `entrypoint.sh` (`sleep 2` → `sleep 5`).
 
-### ❌ A porta 3307 já está em uso
-- Mude a porta do host no `docker-compose.yml` (ex: `"3308:3306"`). Depois use essa nova porta no Workbench.
+### A porta 3307 já está em uso
+Altere o mapeamento no `docker-compose.yml` (ex: `"3308:3306"`) e use a nova porta no Workbench.
 
-### ❌ A porta 8000 já está em uso
-- Altere o mapeamento para `"8001:8000"` no `docker-compose.yml` e acesse `localhost:8001`.
+### A porta 8000 está ocupada
+Troque o mapeamento para `"8001:8000"` e acesse `localhost:8001`.
 
-### ❌ Permissão negada ao rodar `docker compose`
-- Execute os comandos com `sudo` ou adicione seu usuário ao grupo `docker`:
-  ```bash
-  sudo usermod -aG docker $USER
-  ```
-  (Reinicie a sessão para aplicar.)
-
----
-
-## 👥 Uso em grupo / professor
-
-Para que outra pessoa execute o projeto, basta:
-
-1. Clonar o repositório
-2. Ter o Docker instalado
-3. Executar `docker compose up` na pasta raiz do projeto
-
-Nenhuma configuração adicional de banco de dados ou dependências é necessária.
+### Permissão negada ao usar `docker compose`
+Execute com `sudo` ou adicione seu usuário ao grupo `docker`:
+```bash
+sudo usermod -aG docker $USER
+```
+Lembre-se de reiniciar a sessão.
 
 ---
-
-########################
 
 ## Autor
-Gabryell Costa de Moura
+**Gabryell Costa de Moura**
 
-### Contato
-- Telefone: 63992274895
-- Email: gabryellcostademoura1@gmail.com
-
-
+📞 Telefone: (63) 99227-4895  
+✉️ Email: gabryellcostademoura1@gmail.com
