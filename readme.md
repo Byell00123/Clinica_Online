@@ -42,6 +42,7 @@ sudo usermod -aG docker $USER   # para não precisar de sudo nos comandos docker
 ```bash
 git clone https://github.com/Byell00123/Clinica_Online.git
 cd Clinica_Online/src/healing
+chmod +x entrypoint.sh
 ```
 
 ### 2. Execute o Docker Compose
